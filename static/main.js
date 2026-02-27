@@ -1,16 +1,19 @@
 const API = "http://localhost:8000";
+let activeMeetId = null;
+let activeMeetSaved = false;
 
 // ─── EVENTS ────────────────────────────────────────────
 
 async function loadEvents() {
-  const res = await fetch(`${API}/events`);
+  if (!activeMeetId) return;
+
+  const res = await fetch(`${API}/events?meet_id=${activeMeetId}`);
   const events = await res.json();
 
   const list = document.getElementById("eventList");
   list.innerHTML = "";
 
   for (const event of events) {
-    // For each event, also fetch its swimmers
     const swRes = await fetch(`${API}/events/${event.id}/swimmers`);
     const swimmers = await swRes.json();
     renderEvent(event, swimmers);
@@ -22,6 +25,10 @@ async function addEvent() {
   const gender = document.getElementById("eventGender").value.trim();
   const heat = parseInt(document.getElementById("eventHeat").value);
 
+  if (!activeMeetId) {
+    return alert("Please start a new meet first.");
+  }
+
   if (!name || !heat || !gender) {
     return alert("Please enter a name, gender, and heat number.");
   }
@@ -29,7 +36,7 @@ async function addEvent() {
   await fetch(`${API}/events`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, gender, heat }),
+    body: JSON.stringify({ meet_id: activeMeetId, name, gender, heat }),
   });
 
   // Clear the inputs and reload
@@ -148,6 +155,7 @@ function swimmerRow(s, eventId) {
       </td>
     </tr>
   `;
+
 }
 
 // ─── SWIMMERS ──────────────────────────────────────────
@@ -208,6 +216,7 @@ async function addSwimmer(eventId, isRelay) {
         team: team || null,
         seed_time: seed_time || null,
         actual_time: null,
+        relay_order: null
       }),
     });
   }
@@ -246,13 +255,107 @@ async function deleteSwimmer(id) {
   document.getElementById(`swimmer-${id}`).remove();
 }
 
-// ─── START ─────────────────────────────────────────────
-loadEvents();
+
+// ─── MEETS ─────────────────────────────────────────────
+
+async function loadMeets() {
+  const res = await fetch(`${API}/meets`);
+  const meets = await res.json();
+
+  const list = document.getElementById("meetList");
+  list.innerHTML = "";
+
+  if (meets.length === 0) {
+    list.innerHTML = `<p style="font-size:0.8rem; color:#aaa; margin-top:0.5rem">No saved meets yet.</p>`;
+    return;
+  }
+
+  meets.forEach(meet => {
+    const div = document.createElement("div");
+    div.className = `meet-item${meet.id === activeMeetId ? " active" : ""}`;
+    div.onclick = () => switchMeet(meet.id, true);
+    div.innerHTML = `
+      <span onclick="switchMeet(${meet.id}, true)">${meet.name}</span>
+      <button class="danger" style="padding:2px 7px; font-size:0.8rem"
+        onclick="deleteMeet(${meet.id})">✕</button>
+    `;
+    list.appendChild(div);
+  });
+}
+
+async function newMeet() {
+  // Prompt to save if there's an unsaved active meet
+  if (activeMeetId && !activeMeetSaved) {
+    const proceed = confirm("You have an unsaved meet. Discard it and start a new one?");
+    if (!proceed) return;
+  }
+
+  const res = await fetch(`${API}/meets`, { method: "POST" });
+  const meet = await res.json();
+
+  activeMeetId = meet.id;
+  activeMeetSaved = false;
+
+  // Show the main content area
+  document.getElementById("noMeet").style.display = "none";
+  document.getElementById("meetContent").style.display = "block";
+
+  loadEvents();
+  loadMeets();
+}
+
+async function switchMeet(id, saved) {
+  // Prompt to save if switching away from an unsaved meet
+  if (activeMeetId && !activeMeetSaved && activeMeetId !== id) {
+    const proceed = confirm("You have an unsaved meet. Switch anyway?");
+    if (!proceed) return;
+  }
+
+  activeMeetId = id;
+  activeMeetSaved = saved;
+
+  document.getElementById("noMeet").style.display = "none";
+  document.getElementById("meetContent").style.display = "block";
+
+  loadEvents();
+  loadMeets();
+}
+
+async function saveMeet() {
+  if (!activeMeetId) return;
+
+  const name = prompt("Name this meet:");
+  if (!name || !name.trim()) return;
+
+  await fetch(`${API}/meets/${activeMeetId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name: name.trim() })
+  });
+
+  activeMeetSaved = true;
+  loadMeets();
+}
+
+async function deleteMeet(id) {
+  if (!confirm("Delete this meet and all its events?")) return;
+  await fetch(`${API}/meets/${id}`, { method: "DELETE" });
+  if (activeMeetId === id) {
+    activeMeetId = null;
+    activeMeetSaved = false;
+    document.getElementById("meetContent").style.display = "none";
+    document.getElementById("noMeet").style.display = "block";
+    document.getElementById("eventList").innerHTML = "";
+  }
+  loadMeets();
+}
+
+
 
 // ─── EXPORT CSV ────────────────────────────────────────
 
 async function exportCSV() {
-  const res = await fetch(`${API}/events`);
+  const res = await fetch(`${API}/events?meet_id=${activeMeetId}`);
   const events = await res.json();
   let date = new Date().toISOString().split("T")[0];
 
@@ -291,7 +394,7 @@ async function exportPDF() {
   const doc = new jsPDF();
   let date = new Date().toISOString().split("T")[0];
 
-  const res = await fetch(`${API}/events`);
+  const res = await fetch(`${API}/events?meet_id=${activeMeetId}`);
   const events = await res.json();
 
   let y = 15; // tracks vertical position on the page
@@ -352,3 +455,6 @@ async function exportPDF() {
 
   doc.save(`swim-meet-heatsheet-${date}.pdf`);
 }
+
+// ─── START ─────────────────────────────────────────────
+loadMeets();

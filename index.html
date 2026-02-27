@@ -16,66 +16,85 @@
 
   <h1>Swim Manager</h1>
 
-  <main>
-    <!-- Add Event Form -->
-    <h2>Add Event</h2>
-    <div class="form-row">
+  <div class="app-layout">
 
-      <select id="eventName">
-        <option value="" disabled selected>- Select an event -</option>
-        <option value="" disabled>Freestyle</option>
-        <option>50yd Freestyle</option>
-        <option>100yd Freestyle</option>
-        <option>200yd Freestyle</option>
-        <option>500yd Freestyle</option>
-        <option>1000yd Freestyle</option>
-        <option>1650yd Freestyle</option>
+    <!-- sidebar -->
+     <aside class="sidebar">
+        <h2>Meets</h2>
+        <button onclick="newMeet()">+ New Meet</button>
+        <div id="meetList"></div>
+     </aside>
 
-        <option value="" disabled>Backstroke</option>
-        <option>50yd Backstroke</option>
-        <option>100yd Backstroke</option>
-        <option>200yd Backstroke</option>
+    <main>
 
-        <option value="" disabled>Butterfly</option>
-        <option>50yd Butterfly</option>
-        <option>100yd Butterfly</option>
-        <option>200yd Butterfly</option>
-
-        <option value="" disabled>Breaststroke</option>
-        <option>50yd Breaststroke</option>
-        <option>100yd Breaststroke</option>
-        <option>200yd Breaststroke</option>
-
-        <option value="" disabled>Individual Medley</option>
-        <option>100yd Individual Medley</option>
-        <option>200yd Individual Medley</option>
-        <option>400yd Individual Medley</option>
-
-        <option value="" disabled>Medley Relay</option>
-        <option>200yd Medley Relay</option>
-        <option>400yd Medley Relay</option>
-
-        <option value="" disabled>Freestyle Relay</option>
-        <option>200yd Freestyle Relay</option>
-        <option>400yd Freestyle Relay</option>
-      </select>
-      <select id="eventGender">
-        <option value="" disabled selected>- Men/Women -</option>
-        <option>Men's</option>
-        <option>Women's</option>
-        <option>Mixed</option>
-      </select>
-      <input type="number" id="eventHeat" placeholder="Heat #" style="width: 80px" min="1" value="1" />
-      <button class="addEventBttn" onclick="addEvent()">Add Event</button>
-      <div class="export">
-        <button class="exportBttn" onclick="exportCSV()">Export CSV</button>
-        <button class="exportBttn" onclick="exportPDF()">Export PDF</button>
+      <div id="noMeet">
+        <p>Click "New Meet" to get started!</p>
       </div>
-    </div>
 
-    <!-- Events will be rendered here -->
-    <div id="eventList"></div>
-  </main>
+      <div id="meetContent" style="display: none">
+
+        <!-- Add Event Form -->
+        <h2>Add Event</h2>
+        <div class="form-row">
+          <select id="eventName">
+            <option value="" disabled selected>- Select an event -</option>
+            <option value="" disabled>Freestyle</option>
+            <option>50yd Freestyle</option>
+            <option>100yd Freestyle</option>
+            <option>200yd Freestyle</option>
+            <option>500yd Freestyle</option>
+            <option>1000yd Freestyle</option>
+            <option>1650yd Freestyle</option>
+
+            <option value="" disabled>Backstroke</option>
+            <option>50yd Backstroke</option>
+            <option>100yd Backstroke</option>
+            <option>200yd Backstroke</option>
+
+            <option value="" disabled>Butterfly</option>
+            <option>50yd Butterfly</option>
+            <option>100yd Butterfly</option>
+            <option>200yd Butterfly</option>
+
+            <option value="" disabled>Breaststroke</option>
+            <option>50yd Breaststroke</option>
+            <option>100yd Breaststroke</option>
+            <option>200yd Breaststroke</option>
+
+            <option value="" disabled>Individual Medley</option>
+            <option>100yd Individual Medley</option>
+            <option>200yd Individual Medley</option>
+            <option>400yd Individual Medley</option>
+
+            <option value="" disabled>Medley Relay</option>
+            <option>200yd Medley Relay</option>
+            <option>400yd Medley Relay</option>
+
+            <option value="" disabled>Freestyle Relay</option>
+            <option>200yd Freestyle Relay</option>
+            <option>400yd Freestyle Relay</option>
+          </select>
+          <select id="eventGender">
+            <option value="" disabled selected>- Men/Women -</option>
+            <option>Men's</option>
+            <option>Women's</option>
+            <option>Mixed</option>
+          </select>
+          <input type="number" id="eventHeat" placeholder="Heat #" style="width: 80px" min="1" value="1" />
+          <button class="addEventBttn" onclick="addEvent()">Add Event</button>
+          <div class="export">
+            <button class="exportBttn" onclick="saveMeet()">Save Meet</button>
+            <button class="exportBttn" onclick="exportCSV()">Export CSV</button>
+            <button class="exportBttn" onclick="exportPDF()">Export PDF</button>
+          </div>
+        </div>
+
+        <!-- Events will be rendered here -->
+        <div id="eventList"></div>
+      </div>
+    </main>
+
+  </div>
 
   <footer>
     <p>&copy; Austin deHaan -

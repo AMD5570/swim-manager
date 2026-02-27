@@ -2,7 +2,7 @@
 
 body {
   font-family: "Figtree", sans-serif;
-  max-width: 900px;
+  max-width: 1400px;
   margin: 40px auto;
   padding: 0 20px;
   background: #f5f7fa;
@@ -127,4 +127,44 @@ footer {
   justify-content: flex-end;
   align-items: center;
   margin-left: auto;
+}
+
+.app-layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.sidebar h2 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+}
+
+.meet-item {
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-top: 0.4rem;
+  border: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meet-item:hover { 
+  background: #f1f5f9; 
+}
+
+.meet-item.active { 
+  background: #dbeafe; border-color: #3b82f6; 
 }
