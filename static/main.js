@@ -1,4 +1,6 @@
-const API = "http://localhost:8000";
+const API = window.location.hostname === "localhost"
+  ? "http://localhost:8000" 
+  : "https://ff4.student.rit.edu/austin/Split-Time-Simple-Meet-Manager/"; 
 
 let activeMeetId = null;
 let activeMeetSaved = false;
